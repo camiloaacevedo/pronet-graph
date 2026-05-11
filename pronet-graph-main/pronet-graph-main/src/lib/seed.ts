@@ -86,6 +86,11 @@ async function seed() {
       CREATE (u3)-[:ENVIO]->(m3)<-[:RECIBIO]-(u1)
     `)
 
+    // Aplicaciones a ofertas (para demostrar candidatos_para_oferta)
+    await session.run(`MATCH (u1:Usuario {id:'1'}), (o1:Oferta {id:'1'}) CREATE (u1)-[:APLICO_A]->(o1)`)
+    await session.run(`MATCH (u4:Usuario {id:'4'}), (o1:Oferta {id:'1'}) CREATE (u4)-[:APLICO_A]->(o1)`)
+    await session.run(`MATCH (u3:Usuario {id:'3'}), (o2:Oferta {id:'2'}) CREATE (u3)-[:APLICO_A]->(o2)`)
+
     console.log('✅ Seed completado')
   } catch (error) {
     console.error('❌ Error:', error)
