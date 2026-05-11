@@ -8,12 +8,17 @@ export async function POST(req: Request) {
   }
   const session = driver.session()
   try {
-    await session.run(`
+    const result = await session.run(`
       MATCH (u:Usuario {id: $usuarioId}), (o:Oferta {id: $ofertaId})
       MERGE (u)-[:APLICO_A]->(o)
     `, { usuarioId, ofertaId })
+    if (result.summary.counters.updates().relationshipsCreated === 0 &&
+        !result.summary.counters.updates().containsUpdates) {
+      return NextResponse.json({ error: 'Usuario u oferta no encontrados' }, { status: 404 })
+    }
     return NextResponse.json({ mensaje: 'Aplicación registrada' }, { status: 201 })
-  } catch {
+  } catch (error) {
+    console.error(error)
     return NextResponse.json({ error: 'Error al registrar aplicación' }, { status: 500 })
   } finally {
     await session.close()
@@ -23,6 +28,7 @@ export async function POST(req: Request) {
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const ofertaId = searchParams.get('ofertaId')
+  if (!ofertaId) return NextResponse.json({ error: 'ofertaId requerido' }, { status: 400 })
   const session = driver.session()
   try {
     const result = await session.run(`
@@ -33,7 +39,8 @@ export async function GET(req: Request) {
       id: r.get('id'), nombre: r.get('nombre'), cargo: r.get('cargo'),
       foto: r.get('foto'), email: r.get('email')
     })))
-  } catch {
+  } catch (error) {
+    console.error(error)
     return NextResponse.json({ error: 'Error al obtener aplicaciones' }, { status: 500 })
   } finally {
     await session.close()
