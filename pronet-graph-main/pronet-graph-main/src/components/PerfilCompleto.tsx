@@ -144,7 +144,7 @@ export default function PerfilCompleto({ usuarioId, onVerConexion }: Props) {
                 <div className="flex gap-2 pb-1">
                   {editando ? (
                     <>
-                      <button onClick={() => setEditando(false)} className="border border-[#c0c0c0] text-sm px-4 py-1.5 rounded-full hover:bg-gray-50">Cancelar</button>
+                      <button onClick={() => { setEditando(false); setEmpresaId(perfil?.empresa?.id || '') }} className="border border-[#c0c0c0] text-sm px-4 py-1.5 rounded-full hover:bg-gray-50">Cancelar</button>
                       <button onClick={guardar} disabled={guardando} className="bg-[#0a66c2] text-white text-sm px-4 py-1.5 rounded-full hover:bg-[#004182] disabled:opacity-50">{guardando ? 'Guardando...' : 'Guardar'}</button>
                     </>
                   ) : (

@@ -56,6 +56,15 @@ export async function PUT(req: Request) {
             DELETE r
           `, { id })
         } else {
+          // Pre-flight: verify empresa exists before mutating
+          const sCheck = driver.session()
+          const exists = await sCheck.run(
+            'MATCH (e:Empresa {id: $empresaId}) RETURN e LIMIT 1',
+            { empresaId }
+          ).finally(() => sCheck.close())
+          if (exists.records.length === 0) {
+            return NextResponse.json({ error: 'Empresa no encontrada' }, { status: 404 })
+          }
           // Switch company (remove old, add new)
           await sEmpresa.run(`
             MATCH (u:Usuario {id: $id})
