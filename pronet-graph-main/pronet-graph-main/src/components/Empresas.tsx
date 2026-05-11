@@ -33,10 +33,19 @@ export default function Empresas() {
   const crearOferta = async () => {
     if (!formOferta.titulo || !seleccionada) return
     setCreando(true)
-    const res = await fetch('/api/ofertas', {
+    const habilidadesArray = formOferta.habilidades
+      .split(',')
+      .map((h: string) => h.trim())
+      .filter(Boolean)
+    await fetch('/api/ofertas', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ titulo: formOferta.titulo, salario: formOferta.salario, empresaId: seleccionada.id })
+      body: JSON.stringify({
+        titulo: formOferta.titulo,
+        salario: formOferta.salario,
+        empresaId: seleccionada.id,
+        habilidades: habilidadesArray
+      })
     })
     setFormOferta({ titulo: '', salario: '', habilidades: '' })
     setCreando(false)
@@ -90,6 +99,12 @@ export default function Empresas() {
                 placeholder="Ej: $4000" value={formOferta.salario}
                 onChange={e => setFormOferta(f => ({ ...f, salario: e.target.value }))} />
             </div>
+          </div>
+          <div className="mb-3">
+            <label className="text-xs text-[#00000099] block mb-1">Habilidades requeridas (separadas por coma)</label>
+            <input className="w-full border border-[#c0c0c0] rounded-lg px-3 py-2 text-sm outline-none focus:border-[#0a66c2]"
+              placeholder="Ej: React, Node.js, SQL" value={formOferta.habilidades}
+              onChange={e => setFormOferta(f => ({ ...f, habilidades: e.target.value }))} />
           </div>
           <button onClick={crearOferta} disabled={creando || !formOferta.titulo}
             className="bg-[#0a66c2] text-white text-sm px-5 py-2 rounded-full hover:bg-[#004182] transition-colors disabled:opacity-50">
