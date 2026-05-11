@@ -47,6 +47,16 @@ export async function GET(req: Request) {
       RETURN o.titulo AS titulo, o.id AS ofertaId, e.nombre AS empresa, o.salario AS salario
     `, { id }).finally(() => s7.close())
 
+    const sEmpresa = driver.session()
+    const empresaResult = await sEmpresa.run(`
+      MATCH (u:Usuario {id: $id})-[:TRABAJA_EN]->(e:Empresa)
+      RETURN e.id AS empresaId, e.nombre AS empresaNombre
+    `, { id }).finally(() => sEmpresa.close())
+    const empresa = empresaResult.records.length > 0 ? {
+      id: empresaResult.records[0].get('empresaId'),
+      nombre: empresaResult.records[0].get('empresaNombre'),
+    } : null
+
     const u = usuario.records[0]?.get('u').properties || {}
 
     return NextResponse.json({
@@ -58,6 +68,7 @@ export async function GET(req: Request) {
       ofertas: ofertas.records.map(r => ({ titulo: r.get('titulo'), ofertaId: r.get('ofertaId'), empresa: r.get('empresa'), salario: r.get('salario'), match: r.get('match').toNumber() })),
       experiencias: experiencias.records.map(r => ({ cargo: r.get('cargo'), empresa: r.get('empresa'), inicio: r.get('inicio'), fin: r.get('fin'), descripcion: r.get('descripcion') })),
       aplicaciones: aplicaciones.records.map(r => ({ titulo: r.get('titulo'), ofertaId: r.get('ofertaId'), empresa: r.get('empresa'), salario: r.get('salario') })),
+      empresa,
     })
   } catch (error) {
     return NextResponse.json({ error: String(error) }, { status: 500 })

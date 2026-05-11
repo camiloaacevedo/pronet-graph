@@ -3,7 +3,7 @@ import driver from '@/lib/neo4j'
 
 export async function PUT(req: Request) {
   const body = await req.json()
-  const { id, nombre, cargo, email, about, foto, ubicacion, habilidades, experiencias } = body
+  const { id, nombre, cargo, email, about, foto, ubicacion, habilidades, experiencias, empresaId } = body
 
   try {
     const s1 = driver.session()
@@ -43,6 +43,31 @@ export async function PUT(req: Request) {
         CREATE (u)-[:TIENE_EXPERIENCIA]->(e)
       `, { id, eid: Date.now().toString() + Math.random(), ...exp })
         .finally(() => s.close())
+    }
+
+    // Actualizar empresa (TRABAJA_EN)
+    if (empresaId !== undefined) {
+      const sEmpresa = driver.session()
+      try {
+        if (!empresaId) {
+          // Remove company link
+          await sEmpresa.run(`
+            MATCH (u:Usuario {id: $id})-[r:TRABAJA_EN]->(:Empresa)
+            DELETE r
+          `, { id })
+        } else {
+          // Switch company (remove old, add new)
+          await sEmpresa.run(`
+            MATCH (u:Usuario {id: $id})
+            OPTIONAL MATCH (u)-[r:TRABAJA_EN]->(:Empresa) DELETE r
+            WITH u
+            MATCH (e:Empresa {id: $empresaId})
+            CREATE (u)-[:TRABAJA_EN]->(e)
+          `, { id, empresaId })
+        }
+      } finally {
+        await sEmpresa.close()
+      }
     }
 
     return NextResponse.json({ ok: true })

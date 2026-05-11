@@ -19,11 +19,18 @@ export default function PerfilCompleto({ usuarioId, onVerConexion }: Props) {
   const [guardando, setGuardando] = useState(false)
   const [aplicando, setAplicando] = useState<string | null>(null)
   const [yaAplico, setYaAplico] = useState<Set<string>>(new Set())
+  const [empresas, setEmpresas] = useState<any[]>([])
+  const [empresaId, setEmpresaId] = useState<string>('')
   const fileRef = useRef<HTMLInputElement>(null)
 
   const cargar = async () => {
-    const data = await fetch(`/api/perfil?id=${id}`).then(r => r.json())
+    const [data, listaEmpresas] = await Promise.all([
+      fetch(`/api/perfil?id=${id}`).then(r => r.json()),
+      fetch('/api/empresas').then(r => r.json()),
+    ])
     setPerfil(data)
+    setEmpresas(listaEmpresas)
+    setEmpresaId(data.empresa?.id || '')
     setForm({
       nombre: data.nombre || '',
       cargo: data.cargo || '',
@@ -81,7 +88,7 @@ export default function PerfilCompleto({ usuarioId, onVerConexion }: Props) {
     await fetch('/api/perfil/actualizar', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id, ...form })
+      body: JSON.stringify({ id, ...form, empresaId })
     })
     if (esMiPerfil) login({ ...usuario!, nombre: form.nombre, email: form.email, cargo: form.cargo })
     await cargar()
@@ -171,11 +178,29 @@ export default function PerfilCompleto({ usuarioId, onVerConexion }: Props) {
                   <label className="text-xs text-[#00000099] block mb-1">Sobre mí</label>
                   <textarea rows={3} className="w-full border border-[#c0c0c0] rounded-lg px-3 py-2 text-sm outline-none focus:border-[#0a66c2] resize-none" value={form.about} onChange={e => setForm((f: any) => ({ ...f, about: e.target.value }))} placeholder="Cuéntanos sobre ti..." />
                 </div>
+                <div>
+                  <label className="text-xs text-[#00000099] block mb-1">Empresa actual</label>
+                  <select
+                    className="w-full border border-[#c0c0c0] rounded-lg px-3 py-2 text-sm outline-none focus:border-[#0a66c2] bg-white"
+                    value={empresaId}
+                    onChange={e => setEmpresaId(e.target.value)}
+                  >
+                    <option value="">Sin empresa</option>
+                    {empresas.map(e => (
+                      <option key={e.id} value={e.id}>{e.nombre}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
             ) : (
               <>
                 <h2 className="text-2xl font-bold">{perfil.nombre}</h2>
                 <p className="text-[#00000099]">{perfil.cargo}</p>
+                {perfil.empresa && (
+                  <p className="text-sm text-[#00000099] flex items-center gap-1 mt-1">
+                    🏢 {perfil.empresa.nombre}
+                  </p>
+                )}
                 {perfil.ubicacion && <p className="text-sm text-[#00000099]">📍 {perfil.ubicacion}</p>}
                 <p className="text-sm text-[#00000099]">{perfil.email}</p>
                 <div className="flex gap-3 mt-2 text-sm">
