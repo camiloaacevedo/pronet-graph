@@ -101,8 +101,12 @@ export default function PerfilCompleto({ usuarioId, onVerConexion }: Props) {
     setGuardando(false)
   }
 
+  const [creandoProyecto, setCreandoProyecto] = useState(false)
+  const [uniendose, setUniendose] = useState<string | null>(null)
+
   const crearProyecto = async () => {
-    if (!nuevoProyecto.nombre.trim()) return
+    if (!nuevoProyecto.nombre.trim() || creandoProyecto) return
+    setCreandoProyecto(true)
     const tecnologiasArray = nuevoProyecto.tecnologias
       .split(',')
       .map((t: string) => t.trim())
@@ -118,16 +122,20 @@ export default function PerfilCompleto({ usuarioId, onVerConexion }: Props) {
     })
     setMostrarFormProyecto(false)
     setNuevoProyecto({ nombre: '', tecnologias: '' })
-    cargar()
+    setCreandoProyecto(false)
+    await cargar()
   }
 
   const unirseProyecto = async (proyectoId: string) => {
+    if (uniendose) return
+    setUniendose(proyectoId)
     await fetch('/api/proyectos', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ usuarioId: id, proyectoId })
     })
-    cargar()
+    setUniendose(null)
+    await cargar()
   }
 
   const aplicar = async (ofertaId: string) => {
@@ -372,8 +380,8 @@ export default function PerfilCompleto({ usuarioId, onVerConexion }: Props) {
                 onChange={e => setNuevoProyecto(p => ({ ...p, tecnologias: e.target.value }))}
               />
               <div className="flex gap-2">
-                <button onClick={crearProyecto} className="bg-[#0a66c2] text-white text-xs px-4 py-1.5 rounded-full hover:bg-[#004182]">
-                  Crear
+                <button onClick={crearProyecto} disabled={creandoProyecto} className="bg-[#0a66c2] text-white text-xs px-4 py-1.5 rounded-full hover:bg-[#004182] disabled:opacity-50">
+                  {creandoProyecto ? 'Creando...' : 'Crear'}
                 </button>
                 <button onClick={() => setMostrarFormProyecto(false)} className="text-xs text-[#00000099] hover:underline">
                   Cancelar
@@ -414,9 +422,10 @@ export default function PerfilCompleto({ usuarioId, onVerConexion }: Props) {
                     </div>
                     <button
                       onClick={() => unirseProyecto(p.id)}
-                      className="text-xs text-[#0a66c2] border border-[#0a66c2] px-3 py-1 rounded-full hover:bg-[#eef3f8] flex-shrink-0 ml-2"
+                      disabled={uniendose === p.id}
+                      className="text-xs text-[#0a66c2] border border-[#0a66c2] px-3 py-1 rounded-full hover:bg-[#eef3f8] flex-shrink-0 ml-2 disabled:opacity-50"
                     >
-                      Unirse
+                      {uniendose === p.id ? 'Uniéndose...' : 'Unirse'}
                     </button>
                   </div>
                 ))}
