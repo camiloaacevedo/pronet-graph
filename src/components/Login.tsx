@@ -34,7 +34,11 @@ export default function Login() {
       })
       const data = await res.json()
       if (!res.ok) setError(data.error)
-      else login(data)
+      else {
+        setModo('login')
+        setForm({ nombre: '', email: '', password: '', cargo: '' })
+        setError('')
+      }
     }
     setLoading(false)
   }
