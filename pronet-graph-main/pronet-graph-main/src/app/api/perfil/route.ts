@@ -24,7 +24,7 @@ export async function GET(req: Request) {
     const s4 = driver.session()
     const proyectos = await s4.run(`
       MATCH (u:Usuario {id:$id})-[:PARTICIPA_EN]->(p:Proyecto)
-      RETURN p.nombre AS nombre, p.tecnologias AS tecnologias
+      RETURN p.id AS id, p.nombre AS nombre, p.tecnologias AS tecnologias
     `, { id }).finally(() => s4.close())
 
     const s5 = driver.session()
@@ -64,7 +64,7 @@ export async function GET(req: Request) {
       password: undefined,
       conexiones: conexiones.records.map(r => ({ nombre: r.get('nombre'), cargo: r.get('cargo'), id: r.get('id'), foto: r.get('foto') })),
       habilidades: habilidades.records.map(r => r.get('nombre')),
-      proyectos: proyectos.records.map(r => ({ nombre: r.get('nombre'), tecnologias: r.get('tecnologias') })),
+      proyectos: proyectos.records.map(r => ({ id: r.get('id'), nombre: r.get('nombre'), tecnologias: r.get('tecnologias') })),
       ofertas: ofertas.records.map(r => ({ titulo: r.get('titulo'), ofertaId: r.get('ofertaId'), empresa: r.get('empresa'), salario: r.get('salario'), match: r.get('match').toNumber() })),
       experiencias: experiencias.records.map(r => ({ cargo: r.get('cargo'), empresa: r.get('empresa'), inicio: r.get('inicio'), fin: r.get('fin'), descripcion: r.get('descripcion') })),
       aplicaciones: aplicaciones.records.map(r => ({ titulo: r.get('titulo'), ofertaId: r.get('ofertaId'), empresa: r.get('empresa'), salario: r.get('salario') })),

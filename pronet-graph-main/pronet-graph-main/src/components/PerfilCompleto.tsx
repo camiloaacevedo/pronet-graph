@@ -21,15 +21,20 @@ export default function PerfilCompleto({ usuarioId, onVerConexion }: Props) {
   const [yaAplico, setYaAplico] = useState<Set<string>>(new Set())
   const [empresas, setEmpresas] = useState<any[]>([])
   const [empresaId, setEmpresaId] = useState<string>('')
+  const [todosProyectos, setTodosProyectos] = useState<any[]>([])
+  const [nuevoProyecto, setNuevoProyecto] = useState({ nombre: '', tecnologias: '' })
+  const [mostrarFormProyecto, setMostrarFormProyecto] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
 
   const cargar = async () => {
-    const [data, listaEmpresas] = await Promise.all([
+    const [data, listaEmpresas, todosP] = await Promise.all([
       fetch(`/api/perfil?id=${id}`).then(r => r.json()),
       fetch('/api/empresas').then(r => r.json()),
+      fetch('/api/proyectos').then(r => r.json()),
     ])
     setPerfil(data)
     setEmpresas(listaEmpresas)
+    setTodosProyectos(todosP)
     setEmpresaId(data.empresa?.id || '')
     setForm({
       nombre: data.nombre || '',
@@ -94,6 +99,35 @@ export default function PerfilCompleto({ usuarioId, onVerConexion }: Props) {
     await cargar()
     setEditando(false)
     setGuardando(false)
+  }
+
+  const crearProyecto = async () => {
+    if (!nuevoProyecto.nombre.trim()) return
+    const tecnologiasArray = nuevoProyecto.tecnologias
+      .split(',')
+      .map((t: string) => t.trim())
+      .filter(Boolean)
+    await fetch('/api/proyectos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        nombre: nuevoProyecto.nombre,
+        tecnologias: tecnologiasArray,
+        usuarioId: id
+      })
+    })
+    setMostrarFormProyecto(false)
+    setNuevoProyecto({ nombre: '', tecnologias: '' })
+    cargar()
+  }
+
+  const unirseProyecto = async (proyectoId: string) => {
+    await fetch('/api/proyectos', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ usuarioId: id, proyectoId })
+    })
+    cargar()
   }
 
   const aplicar = async (ofertaId: string) => {
@@ -310,12 +344,48 @@ export default function PerfilCompleto({ usuarioId, onVerConexion }: Props) {
         </div>
 
         {/* Proyectos */}
-        {perfil.proyectos?.length > 0 && (
-          <div className="bg-white rounded-xl border border-[#e0dfdc] p-5">
-            <h3 className="font-semibold mb-3">Proyectos</h3>
+        <div className="bg-white rounded-xl border border-[#e0dfdc] p-5">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold">Proyectos</h3>
+            {esMiPerfil && (
+              <button
+                onClick={() => setMostrarFormProyecto(!mostrarFormProyecto)}
+                className="text-xs text-[#0a66c2] hover:underline"
+              >
+                + Nuevo
+              </button>
+            )}
+          </div>
+
+          {mostrarFormProyecto && (
+            <div className="mb-3 p-3 border border-[#e0dfdc] rounded-xl flex flex-col gap-2 bg-[#f3f2ef]">
+              <input
+                placeholder="Nombre del proyecto"
+                className="border border-[#c0c0c0] rounded-lg px-3 py-2 text-sm outline-none focus:border-[#0a66c2] bg-white"
+                value={nuevoProyecto.nombre}
+                onChange={e => setNuevoProyecto(p => ({ ...p, nombre: e.target.value }))}
+              />
+              <input
+                placeholder="Tecnologias (ej: React, Node.js)"
+                className="border border-[#c0c0c0] rounded-lg px-3 py-2 text-sm outline-none focus:border-[#0a66c2] bg-white"
+                value={nuevoProyecto.tecnologias}
+                onChange={e => setNuevoProyecto(p => ({ ...p, tecnologias: e.target.value }))}
+              />
+              <div className="flex gap-2">
+                <button onClick={crearProyecto} className="bg-[#0a66c2] text-white text-xs px-4 py-1.5 rounded-full hover:bg-[#004182]">
+                  Crear
+                </button>
+                <button onClick={() => setMostrarFormProyecto(false)} className="text-xs text-[#00000099] hover:underline">
+                  Cancelar
+                </button>
+              </div>
+            </div>
+          )}
+
+          {perfil.proyectos?.length > 0 ? (
             <div className="flex flex-col divide-y divide-[#e0dfdc]">
               {perfil.proyectos.map((p: any, i: number) => (
-                <div key={i} className="py-3 first:pt-0 last:pb-0">
+                <div key={p.id || i} className="py-3 first:pt-0 last:pb-0">
                   <p className="font-medium text-sm">{p.nombre}</p>
                   <div className="flex flex-wrap gap-1 mt-1">
                     {p.tecnologias?.map((t: string, j: number) => (
@@ -325,8 +395,34 @@ export default function PerfilCompleto({ usuarioId, onVerConexion }: Props) {
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          ) : (
+            <p className="text-sm text-[#00000099]">Sin proyectos</p>
+          )}
+
+          {esMiPerfil && todosProyectos.filter(p => !perfil.proyectos?.find((up: any) => up.id === p.id)).length > 0 && (
+            <div className="mt-3 border-t border-[#e0dfdc] pt-3">
+              <p className="text-xs text-[#00000099] font-medium mb-2">Otros proyectos disponibles</p>
+              {todosProyectos
+                .filter(p => !perfil.proyectos?.find((up: any) => up.id === p.id))
+                .map((p: any) => (
+                  <div key={p.id} className="flex items-center justify-between py-1.5 text-sm">
+                    <div>
+                      <span className="text-[#000000e6]">{p.nombre}</span>
+                      {p.tecnologias?.length > 0 && (
+                        <p className="text-xs text-[#00000099]">{p.tecnologias.join(', ')}</p>
+                      )}
+                    </div>
+                    <button
+                      onClick={() => unirseProyecto(p.id)}
+                      className="text-xs text-[#0a66c2] border border-[#0a66c2] px-3 py-1 rounded-full hover:bg-[#eef3f8] flex-shrink-0 ml-2"
+                    >
+                      Unirse
+                    </button>
+                  </div>
+                ))}
+            </div>
+          )}
+        </div>
 
         {/* Conexiones */}
         <div className="bg-white rounded-xl border border-[#e0dfdc] p-5">
