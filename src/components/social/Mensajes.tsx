@@ -27,7 +27,7 @@ export default function Mensajes() {
   const enviar = async () => {
     if (!texto.trim() || !seleccionado || !usuario) return
     setEnviando(true)
-    await fetch('/api/mensajes', {
+    await fetch('/api/social/mensajes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ deId: usuario.id, paraId: seleccionado.id, texto })

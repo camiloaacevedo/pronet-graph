@@ -8,7 +8,7 @@ export default function FormUsuario({ onCreado }: { onCreado: () => void }) {
   const handleSubmit = async () => {
     if (!form.nombre || !form.email || !form.cargo) return
     setLoading(true)
-    await fetch('/api/usuarios', {
+    await fetch('/api/graph/usuarios', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(form)

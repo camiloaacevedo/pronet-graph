@@ -11,7 +11,7 @@ export default function TablaOfertas() {
   const [yaAplico, setYaAplico] = useState<Set<string>>(new Set())
 
   useEffect(() => {
-    fetch('/api/ofertas').then(r => r.json()).then(setOfertas)
+    fetch('/api/business/ofertas').then(r => r.json()).then(setOfertas)
     if (usuario) {
       fetch(`/api/perfil?id=${usuario.id}`)
         .then(r => r.json())
@@ -27,7 +27,7 @@ export default function TablaOfertas() {
 
   const aplicar = async (ofertaId: string) => {
     setAplicando(ofertaId)
-    await fetch('/api/aplicaciones', {
+    await fetch('/api/business/aplicaciones', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ usuarioId: usuario?.id, ofertaId })

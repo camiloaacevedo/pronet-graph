@@ -5,7 +5,7 @@ export default function TablaEmpresas() {
   const [empresas, setEmpresas] = useState<any[]>([])
 
   useEffect(() => {
-    fetch('/api/empresas').then(r => r.json()).then(setEmpresas)
+    fetch('/api/business/empresas').then(r => r.json()).then(setEmpresas)
   }, [])
 
   return (

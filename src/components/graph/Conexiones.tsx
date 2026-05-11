@@ -15,7 +15,7 @@ export default function Conexiones() {
   const cargarDatos = async () => {
     if (!usuario) return
     const [todosRes, recsRes] = await Promise.all([
-      fetch('/api/usuarios').then(r => r.json()),
+      fetch('/api/graph/usuarios').then(r => r.json()),
       fetch(`/api/recomendaciones?usuarioId=${usuario.id}`).then(r => r.json())
     ])
     setTodos(todosRes)
@@ -38,7 +38,7 @@ export default function Conexiones() {
   const conectar = async (u: any) => {
     if (!usuario) return
     setConectando(u.id)
-    await fetch('/api/conexiones', {
+    await fetch('/api/graph/conexiones', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ usuarioId1: usuario.id, usuarioId2: u.id })
@@ -53,7 +53,7 @@ export default function Conexiones() {
   const eliminarConexion = async (u: any) => {
     if (!usuario) return
     setEliminando(u.id)
-    await fetch('/api/conexiones', {
+    await fetch('/api/graph/conexiones', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ usuarioId1: usuario.id, usuarioId2: u.id })

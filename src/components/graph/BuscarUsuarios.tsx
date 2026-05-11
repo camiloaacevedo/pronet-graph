@@ -8,7 +8,7 @@ export default function BuscarUsuarios() {
   const [seleccionado, setSeleccionado] = useState<any>(null)
 
   useEffect(() => {
-    fetch('/api/usuarios').then(r => r.json()).then(setTodos)
+    fetch('/api/graph/usuarios').then(r => r.json()).then(setTodos)
   }, [])
 
   const filtrados = todos.filter(u =>

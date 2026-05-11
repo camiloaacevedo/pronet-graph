@@ -12,9 +12,9 @@ export default function Feed({ setTab }: { setTab: (t: string) => void }) {
 
   const cargar = async () => {
     const [pubs, usrs, offs] = await Promise.all([
-      fetch('/api/publicaciones').then(r => r.json()),
-      fetch('/api/usuarios').then(r => r.json()),
-      fetch('/api/ofertas').then(r => r.json()),
+      fetch('/api/business/publicaciones').then(r => r.json()),
+      fetch('/api/graph/usuarios').then(r => r.json()),
+      fetch('/api/business/ofertas').then(r => r.json()),
     ])
     setPublicaciones(pubs)
     setUsuarios(usrs)
@@ -26,7 +26,7 @@ export default function Feed({ setTab }: { setTab: (t: string) => void }) {
   const publicar = async () => {
     if (!texto.trim() || !usuario) return
     setPublicando(true)
-    await fetch('/api/publicaciones', {
+    await fetch('/api/business/publicaciones', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ usuarioId: usuario.id, texto })

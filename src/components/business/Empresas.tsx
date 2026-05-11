@@ -15,12 +15,12 @@ export default function Empresas() {
   const [formEmpresa, setFormEmpresa] = useState({ nombre: '', sector: '' })
 
   useEffect(() => {
-    fetch('/api/empresas').then(r => r.json()).then(setEmpresas)
+    fetch('/api/business/empresas').then(r => r.json()).then(setEmpresas)
   }, [])
 
   const verEmpresa = async (e: any) => {
     setSeleccionada(e)
-    const data = await fetch('/api/ofertas').then(r => r.json())
+    const data = await fetch('/api/business/ofertas').then(r => r.json())
     const deEmpresa = data.filter((o: any) => o.empresa === e.nombre)
     setOfertas(deEmpresa)
     const cands: Record<string, any[]> = {}
@@ -38,7 +38,7 @@ export default function Empresas() {
       .split(',')
       .map((h: string) => h.trim())
       .filter(Boolean)
-    await fetch('/api/ofertas', {
+    await fetch('/api/business/ofertas', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -56,12 +56,12 @@ export default function Empresas() {
   const crearEmpresa = async () => {
     if (!formEmpresa.nombre || creandoEmpresa) return
     setCreandoEmpresa(true)
-    await fetch('/api/empresas', {
+    await fetch('/api/business/empresas', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(formEmpresa)
     })
-    const data = await fetch('/api/empresas').then(r => r.json())
+    const data = await fetch('/api/business/empresas').then(r => r.json())
     setEmpresas(data)
     setNuevaEmpresa(false)
     setFormEmpresa({ nombre: '', sector: '' })

@@ -34,15 +34,15 @@ export default function AnalisisRed() {
 
   useEffect(() => {
     Promise.all([
-      fetch('/api/usuarios').then(r => r.json()),
-      fetch('/api/empresas').then(r => r.json()),
-      fetch('/api/ofertas').then(r => r.json()),
+      fetch('/api/graph/usuarios').then(r => r.json()),
+      fetch('/api/business/empresas').then(r => r.json()),
+      fetch('/api/business/ofertas').then(r => r.json()),
     ]).then(([u, e, o]) => {
       setUsuarios(u)
       setEmpresas(e)
       setOfertas(o)
       // Extraer proyectos únicos de usuarios
-      fetch('/api/proyectos').then(r => r.json()).then(setProyectos).catch(() => {})
+      fetch('/api/graph/proyectos').then(r => r.json()).then(setProyectos).catch(() => {})
     })
     // Params por defecto
     if (usuario) setParams({ usuarioId: usuario.id })
@@ -57,7 +57,7 @@ export default function AnalisisRed() {
     setCargando(true)
     setResultado(null)
     const body = { tipo: consultaActiva, ...params }
-    const res = await fetch('/api/analisis', {
+    const res = await fetch('/api/graph/analisis', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(body)

@@ -29,8 +29,8 @@ export default function PerfilCompleto({ usuarioId, onVerConexion }: Props) {
   const cargar = async () => {
     const [data, listaEmpresas, todosP] = await Promise.all([
       fetch(`/api/perfil?id=${id}`).then(r => r.json()),
-      fetch('/api/empresas').then(r => r.json()),
-      fetch('/api/proyectos').then(r => r.json()),
+      fetch('/api/business/empresas').then(r => r.json()),
+      fetch('/api/graph/proyectos').then(r => r.json()),
     ])
     setPerfil(data)
     setEmpresas(listaEmpresas)
@@ -90,7 +90,7 @@ export default function PerfilCompleto({ usuarioId, onVerConexion }: Props) {
 
   const guardar = async () => {
     setGuardando(true)
-    await fetch('/api/perfil/actualizar', {
+    await fetch('/api/profile/actualizar', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, ...form, empresaId })
@@ -111,7 +111,7 @@ export default function PerfilCompleto({ usuarioId, onVerConexion }: Props) {
       .split(',')
       .map((t: string) => t.trim())
       .filter(Boolean)
-    await fetch('/api/proyectos', {
+    await fetch('/api/graph/proyectos', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -129,7 +129,7 @@ export default function PerfilCompleto({ usuarioId, onVerConexion }: Props) {
   const unirseProyecto = async (proyectoId: string) => {
     if (uniendose) return
     setUniendose(proyectoId)
-    await fetch('/api/proyectos', {
+    await fetch('/api/graph/proyectos', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ usuarioId: id, proyectoId })
@@ -140,7 +140,7 @@ export default function PerfilCompleto({ usuarioId, onVerConexion }: Props) {
 
   const aplicar = async (ofertaId: string) => {
     setAplicando(ofertaId)
-    await fetch('/api/aplicaciones', {
+    await fetch('/api/business/aplicaciones', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ usuarioId: usuario?.id, ofertaId })
