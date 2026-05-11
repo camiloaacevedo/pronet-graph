@@ -10,7 +10,7 @@ export async function GET(req: Request) {
     const result = await session.run(`
       MATCH (u:Usuario {id: $usuarioId})-[:ENVIO|RECIBIO]-(m:Mensaje)-[:RECIBIO|ENVIO]-(otro:Usuario)
       WHERE otro.id <> $usuarioId
-      WITH otro, m ORDER BY m.fecha DESC
+      WITH DISTINCT otro, m ORDER BY m.fecha DESC
       WITH otro, collect(m)[0] AS ultimo
       RETURN otro.id AS id, otro.nombre AS nombre, otro.cargo AS cargo,
              otro.foto AS foto, ultimo.texto AS ultimoMensaje, ultimo.fecha AS fecha
@@ -23,6 +23,8 @@ export async function GET(req: Request) {
       ultimoMensaje: r.get('ultimoMensaje'),
       fecha: r.get('fecha'),
     })))
+  } catch {
+    return NextResponse.json({ error: 'Error al obtener conversaciones' }, { status: 500 })
   } finally {
     await session.close()
   }
