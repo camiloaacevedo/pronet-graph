@@ -7,14 +7,25 @@ export async function GET(req: Request) {
   const session = driver.session()
   try {
     const result = await session.run(`
-      MATCH (u:Usuario {id:$usuarioId})-[:ENVIO|RECIBIO]-(m:Mensaje)-(otro:Usuario)
-      RETURN DISTINCT otro.id AS id, otro.nombre AS nombre, otro.cargo AS cargo, otro.foto AS foto,
-             m.texto AS ultimoMensaje, m.fecha AS fecha
-      ORDER BY m.fecha DESC
+      MATCH (u:Usuario {id: $usuarioId})-[:ENVIO]->(m:Mensaje)<-[:RECIBIO]-(otro:Usuario)
+      WITH otro, m ORDER BY m.fecha DESC
+      WITH otro, collect(m)[0] AS ultimo
+      RETURN otro.id AS id, otro.nombre AS nombre, otro.cargo AS cargo,
+             otro.foto AS foto, ultimo.texto AS ultimoMensaje, ultimo.fecha AS fecha
+      UNION
+      MATCH (otro:Usuario)-[:ENVIO]->(m:Mensaje)<-[:RECIBIO]-(u:Usuario {id: $usuarioId})
+      WITH otro, m ORDER BY m.fecha DESC
+      WITH otro, collect(m)[0] AS ultimo
+      RETURN otro.id AS id, otro.nombre AS nombre, otro.cargo AS cargo,
+             otro.foto AS foto, ultimo.texto AS ultimoMensaje, ultimo.fecha AS fecha
     `, { usuarioId })
     return NextResponse.json(result.records.map(r => ({
-      id: r.get('id'), nombre: r.get('nombre'), cargo: r.get('cargo'),
-      foto: r.get('foto'), ultimoMensaje: r.get('ultimoMensaje'), fecha: r.get('fecha')
+      id: r.get('id'),
+      nombre: r.get('nombre'),
+      cargo: r.get('cargo'),
+      foto: r.get('foto'),
+      ultimoMensaje: r.get('ultimoMensaje'),
+      fecha: r.get('fecha'),
     })))
   } finally {
     await session.close()

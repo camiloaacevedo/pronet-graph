@@ -69,6 +69,23 @@ async function seed() {
     await session.run(`MATCH (o2:Oferta {id:'2'}), (h3:Habilidad {id:'3'}) CREATE (o2)-[:REQUIERE]->(h3)`)
     await session.run(`MATCH (o2:Oferta {id:'2'}), (h5:Habilidad {id:'5'}) CREATE (o2)-[:REQUIERE]->(h5)`)
 
+    // Mensajes de prueba
+    await session.run(`
+      MATCH (u1:Usuario {id:'1'}), (u2:Usuario {id:'2'})
+      CREATE (m1:Mensaje {id: '1', texto: 'Hola Carlos, ¿tienes tiempo para revisar el PR?', fecha: '2026-05-10T10:00:00'})
+      CREATE (u1)-[:ENVIO]->(m1)<-[:RECIBIO]-(u2)
+    `)
+    await session.run(`
+      MATCH (u2:Usuario {id:'2'}), (u1:Usuario {id:'1'})
+      CREATE (m2:Mensaje {id: '2', texto: 'Claro Ana, lo reviso hoy.', fecha: '2026-05-10T10:05:00'})
+      CREATE (u2)-[:ENVIO]->(m2)<-[:RECIBIO]-(u1)
+    `)
+    await session.run(`
+      MATCH (u3:Usuario {id:'3'}), (u1:Usuario {id:'1'})
+      CREATE (m3:Mensaje {id: '3', texto: 'Ana, te mando el reporte del análisis.', fecha: '2026-05-10T11:00:00'})
+      CREATE (u3)-[:ENVIO]->(m3)<-[:RECIBIO]-(u1)
+    `)
+
     console.log('✅ Seed completado')
   } catch (error) {
     console.error('❌ Error:', error)
