@@ -9,6 +9,7 @@ export default function Empresas() {
   const [ofertas, setOfertas] = useState<any[]>([])
   const [candidatos, setCandidatos] = useState<Record<string, any[]>>({})
   const [creando, setCreando] = useState(false)
+  const [creandoEmpresa, setCreandoEmpresa] = useState(false)
   const [formOferta, setFormOferta] = useState({ titulo: '', salario: '', habilidades: '' })
   const [nuevaEmpresa, setNuevaEmpresa] = useState(false)
   const [formEmpresa, setFormEmpresa] = useState({ nombre: '', sector: '' })
@@ -53,7 +54,8 @@ export default function Empresas() {
   }
 
   const crearEmpresa = async () => {
-    if (!formEmpresa.nombre) return
+    if (!formEmpresa.nombre || creandoEmpresa) return
+    setCreandoEmpresa(true)
     await fetch('/api/empresas', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -63,6 +65,7 @@ export default function Empresas() {
     setEmpresas(data)
     setNuevaEmpresa(false)
     setFormEmpresa({ nombre: '', sector: '' })
+    setCreandoEmpresa(false)
   }
 
   if (seleccionada) return (
@@ -191,8 +194,8 @@ export default function Empresas() {
                 value={formEmpresa.sector} onChange={e => setFormEmpresa(f => ({ ...f, sector: e.target.value }))} />
             </div>
           </div>
-          <button onClick={crearEmpresa} className="bg-[#0a66c2] text-white text-sm px-5 py-2 rounded-full hover:bg-[#004182]">
-            Crear
+          <button onClick={crearEmpresa} disabled={creandoEmpresa} className="bg-[#0a66c2] text-white text-sm px-5 py-2 rounded-full hover:bg-[#004182] disabled:opacity-50">
+            {creandoEmpresa ? 'Creando...' : 'Crear'}
           </button>
         </div>
       )}

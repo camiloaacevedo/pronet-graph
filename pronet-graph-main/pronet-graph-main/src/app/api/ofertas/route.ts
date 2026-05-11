@@ -40,15 +40,14 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Empresa no encontrada' }, { status: 404 })
     }
     if (habilidades && habilidades.length > 0) {
-      for (const habilidadNombre of habilidades) {
-        await session.run(
-          `MATCH (o:Oferta {id: $ofertaId})
-           MERGE (h:Habilidad {nombre: $habilidadNombre})
-           ON CREATE SET h.id = $hId
-           MERGE (o)-[:REQUIERE]->(h)`,
-          { ofertaId: id, habilidadNombre, hId: crypto.randomUUID() }
-        )
-      }
+      await session.run(
+        `MATCH (o:Oferta {id: $ofertaId})
+         UNWIND $habilidades AS nombre
+         MERGE (h:Habilidad {nombre: nombre})
+         ON CREATE SET h.id = randomUUID()
+         MERGE (o)-[:REQUIERE]->(h)`,
+        { ofertaId: id, habilidades }
+      )
     }
     return NextResponse.json(result.records[0].get('o').properties, { status: 201 })
   } catch (error) {
