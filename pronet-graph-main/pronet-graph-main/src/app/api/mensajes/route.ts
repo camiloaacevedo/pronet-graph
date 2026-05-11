@@ -4,16 +4,12 @@ import driver from '@/lib/neo4j'
 export async function GET(req: Request) {
   const { searchParams } = new URL(req.url)
   const usuarioId = searchParams.get('usuarioId')
+  if (!usuarioId) return NextResponse.json({ error: 'usuarioId requerido' }, { status: 400 })
   const session = driver.session()
   try {
     const result = await session.run(`
-      MATCH (u:Usuario {id: $usuarioId})-[:ENVIO]->(m:Mensaje)<-[:RECIBIO]-(otro:Usuario)
-      WITH otro, m ORDER BY m.fecha DESC
-      WITH otro, collect(m)[0] AS ultimo
-      RETURN otro.id AS id, otro.nombre AS nombre, otro.cargo AS cargo,
-             otro.foto AS foto, ultimo.texto AS ultimoMensaje, ultimo.fecha AS fecha
-      UNION
-      MATCH (otro:Usuario)-[:ENVIO]->(m:Mensaje)<-[:RECIBIO]-(u:Usuario {id: $usuarioId})
+      MATCH (u:Usuario {id: $usuarioId})-[:ENVIO|RECIBIO]-(m:Mensaje)-[:RECIBIO|ENVIO]-(otro:Usuario)
+      WHERE otro.id <> $usuarioId
       WITH otro, m ORDER BY m.fecha DESC
       WITH otro, collect(m)[0] AS ultimo
       RETURN otro.id AS id, otro.nombre AS nombre, otro.cargo AS cargo,
