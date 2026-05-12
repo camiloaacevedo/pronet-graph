@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git init *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git config *)",
+      "Bash(pandoc \"C:\\\\Users\\\\eduar\\\\OneDrive\\\\Desktop\\\\Proyecto_investigacion.docx\" -t markdown)",
+      "Bash(python -c ' *)",
+      "Bash(git -C \"pronet-graph-main/pronet-graph-main\" diff 3d60b58..0e971e9)"
+    ]
+  }
+}
