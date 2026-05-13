@@ -151,7 +151,7 @@ export default function PerfilCompleto({ usuarioId, onVerConexion }: Props) {
 
   if (!perfil) return <div className="text-center py-16 text-[#00000099]">Cargando perfil...</div>
 
-  const Avatar = ({ size = 'md', foto, nombre }: { size?: 'sm'|'md'|'lg', foto?: string, nombre: string }) => {
+  const Avatar = ({ size = 'md', foto, nombre }: { size?: 'sm' | 'md' | 'lg', foto?: string, nombre: string }) => {
     const sizes = { sm: 'w-8 h-8 text-sm', md: 'w-12 h-12 text-lg', lg: 'w-24 h-24 text-4xl' }
     return foto
       ? <img src={foto} className={`${sizes[size]} rounded-full object-cover border-4 border-white flex-shrink-0`} />
@@ -174,11 +174,44 @@ export default function PerfilCompleto({ usuarioId, onVerConexion }: Props) {
           <div className="px-6 pb-5 -mt-12">
             <div className="flex items-end justify-between mb-3">
               <div className="relative">
-                <Avatar size="lg" foto={editando ? form.foto : perfil.foto} nombre={perfil.nombre} />
+                <Avatar
+                  size="lg"
+                  foto={editando ? form.foto : perfil.foto}
+                  nombre={perfil.nombre}
+                />
+
                 {esMiPerfil && editando && (
                   <>
-                    <button onClick={() => fileRef.current?.click()} className="absolute bottom-1 right-1 w-7 h-7 bg-[#0a66c2] rounded-full flex items-center justify-center text-white text-xs hover:bg-[#004182]">✏️</button>
-                    <input ref={fileRef} type="file" accept="image/*" className="hidden" onChange={handleFoto} />
+                    {/* Cambiar foto */}
+                    <button
+                      onClick={() => fileRef.current?.click()}
+                      className="absolute bottom-1 right-1 w-7 h-7 bg-[#0a66c2] rounded-full flex items-center justify-center text-white text-xs hover:bg-[#004182] transition-colors"
+                    >
+                      ✏️
+                    </button>
+
+                    {/* Eliminar foto SOLO si existe */}
+                    {form.foto && (
+                      <button
+                        onClick={() =>
+                          setForm((f: any) => ({
+                            ...f,
+                            foto: ''
+                          }))
+                        }
+                        className="absolute top-1 right-1 w-7 h-7 bg-red-500 rounded-full flex items-center justify-center text-white text-xs hover:bg-red-600 transition-colors"
+                      >
+                        ✕
+                      </button>
+                    )}
+
+                    <input
+                      ref={fileRef}
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      onChange={handleFoto}
+                    />
                   </>
                 )}
               </div>
@@ -474,12 +507,12 @@ export default function PerfilCompleto({ usuarioId, onVerConexion }: Props) {
                     yaAplico.has(o.ofertaId)
                       ? <span className="text-xs text-emerald-600 border border-emerald-300 px-3 py-1.5 rounded-full flex-shrink-0">✓ Aplicado</span>
                       : <button
-                          onClick={() => aplicar(o.ofertaId)}
-                          disabled={aplicando === o.ofertaId}
-                          className="text-[#0a66c2] border border-[#0a66c2] text-xs px-3 py-1.5 rounded-full hover:bg-[#eef3f8] transition-colors flex-shrink-0 disabled:opacity-50"
-                        >
-                          {aplicando === o.ofertaId ? '...' : 'Aplicar'}
-                        </button>
+                        onClick={() => aplicar(o.ofertaId)}
+                        disabled={aplicando === o.ofertaId}
+                        className="text-[#0a66c2] border border-[#0a66c2] text-xs px-3 py-1.5 rounded-full hover:bg-[#eef3f8] transition-colors flex-shrink-0 disabled:opacity-50"
+                      >
+                        {aplicando === o.ofertaId ? '...' : 'Aplicar'}
+                      </button>
                   )}
                 </div>
               ))}
