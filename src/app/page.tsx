@@ -40,7 +40,12 @@ function App() {
       <Navbar tab={tab} setTab={setTab} />
       <main className="max-w-5xl mx-auto px-4 pt-20 pb-8">
         {tab === 'feed' && <Feed setTab={setTab} onVerPerfil={(id) => { setPerfilAver(id); setTab('ver_perfil') }} />}
-        {tab === 'perfil' && <MiPerfil />}
+        {tab === 'perfil' && (
+          <MiPerfil 
+            onVerPerfil={abrirPerfil} 
+            onVerConexiones={abrirConexiones} 
+          />
+        )}
         {tab === 'ver_perfil' && (
           <div>
             <button onClick={() => setTab('feed')} className="flex items-center gap-2 text-[#0a66c2] text-sm mb-4 hover:underline">
