@@ -37,8 +37,11 @@ export default function BuscarUsuarios() {
         <div className="grid grid-cols-2 gap-3">
           {filtrados.map((u, i) => (
             <div key={i} className="bg-white rounded-xl border border-[#e0dfdc] p-4 flex flex-col items-center text-center hover:shadow-md transition-shadow">
-              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#0a66c2] to-[#004182] flex items-center justify-center text-white font-bold text-xl mb-2">
-                {u.nombre[0]}
+              <div className="w-14 h-14 rounded-full bg-gradient-to-br from-[#0a66c2] to-[#004182] flex items-center justify-center text-white font-bold text-xl mb-2 overflow-hidden border border-[#e0dfdc]">
+                {u.foto 
+                  ? <img src={u.foto} className="w-full h-full object-cover" />
+                  : u.nombre[0].toUpperCase()
+                }
               </div>
               <p className="font-semibold text-sm">{u.nombre}</p>
               <p className="text-xs text-[#00000099] mb-3">{u.cargo}</p>
@@ -59,8 +62,11 @@ export default function BuscarUsuarios() {
           <div className="bg-white rounded-xl border border-[#e0dfdc] overflow-hidden sticky top-20">
             <div className="h-16 bg-gradient-to-r from-[#0a66c2] to-[#004182]"></div>
             <div className="px-4 pb-4 -mt-6">
-              <div className="w-12 h-12 rounded-full bg-[#0a66c2] border-2 border-white flex items-center justify-center text-white font-bold mb-2">
-                {seleccionado.nombre[0]}
+              <div className="w-12 h-12 rounded-full bg-[#0a66c2] border-2 border-white flex items-center justify-center text-white font-bold mb-2 overflow-hidden shadow-sm">
+                {seleccionado.foto 
+                  ? <img src={seleccionado.foto} className="w-full h-full object-cover" />
+                  : seleccionado.nombre[0].toUpperCase()
+                }
               </div>
               <p className="font-bold text-sm">{seleccionado.nombre}</p>
               <p className="text-xs text-[#00000099] mb-3">{seleccionado.cargo}</p>

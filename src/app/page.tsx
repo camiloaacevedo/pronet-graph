@@ -65,7 +65,7 @@ function App() {
             onVolver={() => setTab(tabAnterior)}
           />
         )}
-        {tab === 'red' && <Conexiones />}
+        {tab === 'red' && <Conexiones onVerPerfilCompleto={abrirPerfil} />}
         {tab === 'empleos' && (
           <div className="flex flex-col gap-4">
             <h2 className="text-xl font-bold">Empleos</h2>

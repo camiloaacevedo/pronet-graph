@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/AuthContext'
 
-export default function Conexiones() {
+export default function Conexiones({ onVerPerfilCompleto }: { onVerPerfilCompleto?: (id: string) => void }) {
   const { usuario } = useAuth()
   const [todos, setTodos] = useState<any[]>([])
   const [recomendaciones, setRecomendaciones] = useState<any>(null)
@@ -111,8 +111,11 @@ export default function Conexiones() {
               <div className="flex flex-col gap-2">
                 {recomendaciones.conexionesActuales.map((c: any, i: number) => (
                   <div key={i} className="flex items-center gap-3 p-3 border border-[#e0dfdc] rounded-xl hover:bg-gray-50 transition-colors">
-                    <button onClick={() => verPerfil(c)} className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0a66c2] to-[#004182] flex items-center justify-center text-white font-bold flex-shrink-0 hover:opacity-80">
-                      {c.nombre[0]}
+                    <button onClick={() => verPerfil(c)} className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0a66c2] to-[#004182] flex items-center justify-center text-white font-bold flex-shrink-0 hover:opacity-80 overflow-hidden border border-[#e0dfdc]">
+                      {c.foto 
+                        ? <img src={c.foto} className="w-full h-full object-cover" />
+                        : c.nombre[0].toUpperCase()
+                      }
                     </button>
                     <div className="flex-1 min-w-0">
                       <button onClick={() => verPerfil(c)} className="font-medium text-sm hover:text-[#0a66c2] hover:underline text-left">{c.nombre}</button>
@@ -133,8 +136,11 @@ export default function Conexiones() {
             <div className="grid grid-cols-2 gap-3">
               {recomendaciones.contactosRecomendados.map((c: any, i: number) => (
                 <div key={i} className="flex flex-col items-center text-center p-4 border border-[#e0dfdc] rounded-xl hover:shadow-sm transition-shadow">
-                  <button onClick={() => verPerfil(c)} className="w-14 h-14 rounded-full bg-gradient-to-br from-[#0a66c2] to-[#004182] flex items-center justify-center text-white font-bold text-xl mb-2 hover:opacity-80">
-                    {c.nombre[0]}
+                  <button onClick={() => verPerfil(c)} className="w-14 h-14 rounded-full bg-gradient-to-br from-[#0a66c2] to-[#004182] flex items-center justify-center text-white font-bold text-xl mb-2 hover:opacity-80 overflow-hidden border border-[#e0dfdc]">
+                    {c.foto 
+                      ? <img src={c.foto} className="w-full h-full object-cover" />
+                      : c.nombre[0].toUpperCase()
+                    }
                   </button>
                   <button onClick={() => verPerfil(c)} className="font-medium text-sm hover:text-[#0a66c2] hover:underline">{c.nombre}</button>
                   <p className="text-xs text-[#00000099] mb-1">{c.cargo}</p>
@@ -152,8 +158,11 @@ export default function Conexiones() {
           <div className="flex flex-col gap-2">
             {todos.filter(u => u.id !== usuario?.id).map((u, i) => (
               <div key={i} className="flex items-center gap-3 p-3 border border-[#e0dfdc] rounded-xl hover:bg-gray-50 transition-colors">
-                <button onClick={() => verPerfil(u)} className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0a66c2] to-[#004182] flex items-center justify-center text-white font-bold flex-shrink-0 hover:opacity-80">
-                  {u.nombre[0]}
+                <button onClick={() => verPerfil(u)} className="w-10 h-10 rounded-full bg-gradient-to-br from-[#0a66c2] to-[#004182] flex items-center justify-center text-white font-bold flex-shrink-0 hover:opacity-80 overflow-hidden border border-[#e0dfdc]">
+                  {u.foto 
+                    ? <img src={u.foto} className="w-full h-full object-cover" />
+                    : u.nombre[0].toUpperCase()
+                  }
                 </button>
                 <div className="flex-1 min-w-0">
                   <button onClick={() => verPerfil(u)} className="font-medium text-sm hover:text-[#0a66c2] hover:underline text-left">{u.nombre}</button>
@@ -174,13 +183,26 @@ export default function Conexiones() {
               <button onClick={() => { setPanel(null); setPerfilData(null) }} className="absolute top-2 right-3 text-white/70 hover:text-white text-xl">✕</button>
             </div>
             <div className="px-5 pb-5 -mt-8">
-              <div className="w-16 h-16 rounded-full bg-[#0a66c2] border-4 border-white flex items-center justify-center text-white font-bold text-2xl mb-2">
-                {panel.nombre[0]}
+              <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#0a66c2] to-[#004182] border-4 border-white flex items-center justify-center text-white font-bold text-2xl mb-2 overflow-hidden shadow-sm">
+                {panel.foto 
+                  ? <img src={panel.foto} className="w-full h-full object-cover" />
+                  : panel.nombre[0].toUpperCase()
+                }
               </div>
               <p className="font-bold text-base">{panel.nombre}</p>
               <p className="text-sm text-[#00000099]">{panel.cargo}</p>
               <p className="text-xs text-[#00000099] mb-3">{panel.email}</p>
-              <AccionBtn u={panel} />
+              <div className="flex flex-col gap-2">
+                <AccionBtn u={panel} />
+                {onVerPerfilCompleto && (
+                  <button
+                    onClick={() => onVerPerfilCompleto(panel.id)}
+                    className="w-full text-center text-sm font-semibold text-[#0a66c2] border border-[#0a66c2] py-1.5 rounded-full hover:bg-[#eef3f8] transition-colors"
+                  >
+                    Ver perfil completo
+                  </button>
+                )}
+              </div>
 
               {!perfilData ? (
                 <div className="mt-4 text-center text-sm text-[#00000099] py-4">Cargando...</div>
@@ -225,8 +247,11 @@ export default function Conexiones() {
                   <div className="flex flex-col gap-1">
                     {perfilData.conexiones.slice(0, 3).map((c: any, i: number) => (
                       <div key={i} className="flex items-center gap-2">
-                        <div className="w-6 h-6 rounded-full bg-[#0a66c2] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
-                          {c.nombre[0]}
+                        <div className="w-6 h-6 rounded-full bg-gradient-to-br from-[#0a66c2] to-[#004182] flex items-center justify-center text-white text-xs font-bold flex-shrink-0 overflow-hidden">
+                          {c.foto 
+                            ? <img src={c.foto} className="w-full h-full object-cover" />
+                            : c.nombre[0].toUpperCase()
+                          }
                         </div>
                         <p className="text-xs truncate">{c.nombre}</p>
                       </div>
