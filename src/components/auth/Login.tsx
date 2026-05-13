@@ -40,9 +40,22 @@ export default function Login() {
   }
 
   return (
-    <div className="min-h-screen bg-[#f3f2ef] flex">
-      <div className="hidden lg:flex flex-col justify-center px-16 flex-1">
-        <div className="w-10 h-10 bg-[#0a66c2] rounded flex items-center justify-center mb-4">
+    <div className="min-h-screen bg-[#f3f2ef] flex relative overflow-hidden">
+      {/* Fondo cristalino con las letras ProNet */}
+      <div className="absolute inset-0 flex items-center justify-center z-0 pointer-events-none select-none">
+        <h1 
+          className="text-[25vw] font-black opacity-10"
+          style={{
+            WebkitTextFillColor: 'transparent',
+            WebkitTextStroke: 'min(1vw, 4px) var(--primary)'
+          }}
+        >
+          ProNet
+        </h1>
+      </div>
+
+      <div className="hidden lg:flex flex-col justify-center px-16 flex-1 relative z-10">
+        <div className="w-10 h-10 bg-[#0a66c2] rounded flex items-center justify-center mb-4 shadow-lg shadow-[#0a66c2]/20">
           <span className="text-white font-black text-xl">P</span>
         </div>
         <h1 className="text-5xl font-black text-[#0a66c2] leading-tight mb-4">ProNet</h1>
@@ -51,7 +64,7 @@ export default function Login() {
         </p>
       </div>
 
-      <div className="flex flex-col justify-center px-8 py-12 w-full lg:w-[400px] lg:flex-shrink-0">
+      <div className="flex flex-col justify-center px-8 py-12 w-full lg:w-[400px] lg:flex-shrink-0 relative z-10">
         <div className="bg-white rounded-2xl border border-[#e0dfdc] p-8 shadow-sm">
           <h2 className="text-2xl font-semibold mb-6">
             {modo === 'login' ? 'Inicia sesión' : 'Únete a ProNet'}

@@ -15,4 +15,64 @@ body {
   background: var(--background);
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.dark,
+.dark body {
+  --background: #1d2226;
+  --surface: #1d2226;
+  --border: #38434f;
+  --primary: #70b5f9;
+  --primary-hover: #a0cbfb;
+  --text: #e9e9e9;
+  --muted: #8c959f;
+  background-color: var(--background) !important;
+  color: var(--text) !important;
+}
+
+.dark .bg-\[\#f3f2ef\],
+.dark .bg-\[\#eef3f8\] {
+  background-color: #000000 !important;
+}
+
+.dark .bg-white {
+  background-color: var(--surface) !important;
+}
+
+.dark .border-\[\#e0dfdc\] {
+  border-color: var(--border) !important;
+}
+
+.dark .text-\[\#000000e6\],
+.dark .text-black {
+  color: var(--text) !important;
+}
+
+.dark .text-\[\#00000099\] {
+  color: var(--muted) !important;
+}
+
+.dark .border-black {
+  border-color: var(--text) !important;
+}
+
+.dark .hover\:bg-gray-50:hover {
+  background-color: #2d333b !important;
+}
+
+.dark .bg-gray-50 {
+  background-color: #2d333b !important;
+}
+
+.dark .bg-\[\#0a66c2\] {
+  background-color: var(--primary) !important;
+}
+
+.dark .text-\[\#0a66c2\] {
+  color: var(--primary) !important;
+}
+
+.dark .border-\[\#0a66c2\] {
+  border-color: var(--primary) !important;
 }
