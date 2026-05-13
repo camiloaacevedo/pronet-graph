@@ -5,9 +5,10 @@ import { useAuth } from '@/lib/AuthContext'
 interface Props {
   usuarioId?: string  // si es undefined, muestra el perfil propio
   onVerConexion?: (id: string) => void
+  onVerConexiones?: (id: string) => void  // abre la lista de conexiones de un perfil
 }
 
-export default function PerfilCompleto({ usuarioId, onVerConexion }: Props) {
+export default function PerfilCompleto({ usuarioId, onVerConexion, onVerConexiones }: Props) {
   const { usuario, login } = useAuth()
   const id = usuarioId || usuario?.id
   const esMiPerfil = !usuarioId || usuarioId === usuario?.id
@@ -95,7 +96,7 @@ export default function PerfilCompleto({ usuarioId, onVerConexion }: Props) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, ...form, empresaId })
     })
-    if (esMiPerfil) login({ ...usuario!, nombre: form.nombre, email: form.email, cargo: form.cargo })
+    if (esMiPerfil) login({ ...usuario!, nombre: form.nombre, email: form.email, cargo: form.cargo, foto: form.foto })
     await cargar()
     setEditando(false)
     setGuardando(false)
@@ -279,7 +280,12 @@ export default function PerfilCompleto({ usuarioId, onVerConexion }: Props) {
                 {perfil.ubicacion && <p className="text-sm text-[#00000099]">📍 {perfil.ubicacion}</p>}
                 <p className="text-sm text-[#00000099]">{perfil.email}</p>
                 <div className="flex gap-3 mt-2 text-sm">
-                  <span className="text-[#0a66c2] font-semibold cursor-pointer hover:underline">{perfil.conexiones?.length || 0} conexiones</span>
+                  <span
+                    onClick={() => onVerConexiones?.(id!)}
+                    className="text-[#0a66c2] font-semibold cursor-pointer hover:underline"
+                  >
+                    {perfil.conexiones?.length || 0} conexiones
+                  </span>
                 </div>
                 {perfil.about && <p className="mt-3 text-sm text-[#000000e6] leading-relaxed">{perfil.about}</p>}
               </>
@@ -468,25 +474,47 @@ export default function PerfilCompleto({ usuarioId, onVerConexion }: Props) {
 
         {/* Conexiones */}
         <div className="bg-white rounded-xl border border-[#e0dfdc] p-5">
-          <h3 className="font-semibold mb-3">Conexiones · {perfil.conexiones?.length || 0}</h3>
-          <div className="grid grid-cols-2 gap-3">
-            {perfil.conexiones?.map((c: any, i: number) => (
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-semibold">Conexiones · {perfil.conexiones?.length || 0}</h3>
+            {(perfil.conexiones?.length || 0) > 0 && (
               <button
-                key={i}
-                onClick={() => onVerConexion?.(c.id)}
-                className="flex items-center gap-3 p-3 border border-[#e0dfdc] rounded-xl hover:bg-gray-50 transition-colors text-left"
+                onClick={() => onVerConexiones?.(id!)}
+                className="text-xs text-[#0a66c2] hover:underline"
               >
-                {c.foto
-                  ? <img src={c.foto} className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
-                  : <div className="w-9 h-9 rounded-full bg-[#0a66c2] flex items-center justify-center text-white text-sm font-bold flex-shrink-0">{c.nombre[0]}</div>
-                }
-                <div className="min-w-0">
-                  <p className="font-medium text-sm truncate">{c.nombre}</p>
-                  <p className="text-xs text-[#00000099] truncate">{c.cargo}</p>
-                </div>
+                Ver todas
               </button>
-            ))}
+            )}
           </div>
+          {(perfil.conexiones?.length || 0) === 0 ? (
+            <p className="text-sm text-[#00000099]">Sin conexiones aún</p>
+          ) : (
+            <div className="grid grid-cols-2 gap-3">
+              {perfil.conexiones.slice(0, 4).map((c: any, i: number) => (
+                <button
+                  key={i}
+                  onClick={() => onVerConexion?.(c.id)}
+                  className="flex items-center gap-3 p-3 border border-[#e0dfdc] rounded-xl hover:bg-gray-50 transition-colors text-left"
+                >
+                  {c.foto
+                    ? <img src={c.foto} className="w-9 h-9 rounded-full object-cover flex-shrink-0" />
+                    : <div className="w-9 h-9 rounded-full bg-[#0a66c2] flex items-center justify-center text-white text-sm font-bold flex-shrink-0">{c.nombre[0]}</div>
+                  }
+                  <div className="min-w-0">
+                    <p className="font-medium text-sm truncate">{c.nombre}</p>
+                    <p className="text-xs text-[#00000099] truncate">{c.cargo}</p>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+          {(perfil.conexiones?.length || 0) > 4 && (
+            <button
+              onClick={() => onVerConexiones?.(id!)}
+              className="mt-3 w-full text-sm text-[#0a66c2] hover:bg-[#eef3f8] py-2 rounded-lg transition-colors"
+            >
+              Ver las {perfil.conexiones.length} conexiones →
+            </button>
+          )}
         </div>
 
         {/* Ofertas recomendadas */}
