@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '@/lib/AuthContext'
 
-export default function Feed({ setTab }: { setTab: (t: string) => void }) {
+export default function Feed({ setTab, onVerPerfil }: { setTab: (t: string) => void, onVerPerfil: (id: string) => void }) {
   const { usuario } = useAuth()
 
   const [publicaciones, setPublicaciones] = useState<any[]>([])
@@ -204,18 +204,25 @@ export default function Feed({ setTab }: { setTab: (t: string) => void }) {
                   ? (
                     <img
                       src={p.foto}
-                      className="w-10 h-10 rounded-full object-cover flex-shrink-0"
+                      className="w-10 h-10 rounded-full object-cover flex-shrink-0 cursor-pointer"
+                      onClick={() => onVerPerfil(p.autorId)}
                     />
                   )
                   : (
-                    <div className="w-10 h-10 rounded-full bg-[#0a66c2] flex items-center justify-center text-white font-bold flex-shrink-0">
+                    <div 
+                      className="w-10 h-10 rounded-full bg-[#0a66c2] flex items-center justify-center text-white font-bold flex-shrink-0 cursor-pointer"
+                      onClick={() => onVerPerfil(p.autorId)}
+                    >
                       {p.autor[0]}
                     </div>
                   )
                 }
 
                 <div>
-                  <p className="font-semibold text-sm">
+                  <p 
+                    className="font-semibold text-sm cursor-pointer hover:underline"
+                    onClick={() => onVerPerfil(p.autorId)}
+                  >
                     {p.autor}
                   </p>
 
@@ -306,18 +313,25 @@ export default function Feed({ setTab }: { setTab: (t: string) => void }) {
                   ? (
                     <img
                       src={u.foto}
-                      className="w-8 h-8 rounded-full object-cover flex-shrink-0"
+                      className="w-8 h-8 rounded-full object-cover flex-shrink-0 cursor-pointer"
+                      onClick={() => onVerPerfil(u.id)}
                     />
                   )
                   : (
-                    <div className="w-8 h-8 rounded-full bg-[#0a66c2] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+                    <div 
+                      className="w-8 h-8 rounded-full bg-[#0a66c2] flex items-center justify-center text-white text-xs font-bold flex-shrink-0 cursor-pointer"
+                      onClick={() => onVerPerfil(u.id)}
+                    >
                       {u.nombre[0]}
                     </div>
                   )
                 }
 
                 <div className="min-w-0">
-                  <p className="text-xs font-medium truncate">
+                  <p 
+                    className="text-xs font-medium truncate cursor-pointer hover:underline"
+                    onClick={() => onVerPerfil(u.id)}
+                  >
                     {u.nombre}
                   </p>
 

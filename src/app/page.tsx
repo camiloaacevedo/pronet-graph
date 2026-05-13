@@ -5,6 +5,7 @@ import Navbar from '@/components/shared/Navbar'
 import Login from '@/components/auth/Login'
 import Feed from '@/components/social/Feed'
 import MiPerfil from '@/components/profile/MiPerfil'
+import PerfilCompleto from '@/components/profile/PerfilCompleto'
 import Conexiones from '@/components/graph/Conexiones'
 import TablaOfertas from '@/components/business/TablaOfertas'
 import Empresas from '@/components/business/Empresas'
@@ -15,6 +16,7 @@ import AnalisisRed from '@/components/graph/AnalisisRed'
 function App() {
   const { usuario } = useAuth()
   const [tab, setTab] = useState('feed')
+  const [perfilAver, setPerfilAver] = useState<string | null>(null)
   const [refresh, setRefresh] = useState(0)
 
   if (!usuario) return <Login />
@@ -23,8 +25,16 @@ function App() {
     <div className="min-h-screen bg-[#f3f2ef]">
       <Navbar tab={tab} setTab={setTab} />
       <main className="max-w-5xl mx-auto px-4 pt-20 pb-8">
-        {tab === 'feed' && <Feed setTab={setTab} />}
+        {tab === 'feed' && <Feed setTab={setTab} onVerPerfil={(id) => { setPerfilAver(id); setTab('ver_perfil') }} />}
         {tab === 'perfil' && <MiPerfil />}
+        {tab === 'ver_perfil' && (
+          <div>
+            <button onClick={() => setTab('feed')} className="flex items-center gap-2 text-[#0a66c2] text-sm mb-4 hover:underline">
+              ← Volver al inicio
+            </button>
+            <PerfilCompleto usuarioId={perfilAver!} />
+          </div>
+        )}
         {tab === 'red' && <Conexiones />}
         {tab === 'empleos' && (
           <div className="flex flex-col gap-4">
