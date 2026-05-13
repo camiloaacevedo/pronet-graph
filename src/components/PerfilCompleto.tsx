@@ -17,6 +17,8 @@ export default function PerfilCompleto({ usuarioId, onVerConexion }: Props) {
   const [form, setForm] = useState<any>({})
   const [nuevaHabilidad, setNuevaHabilidad] = useState('')
   const [guardando, setGuardando] = useState(false)
+  const [empresas, setEmpresas] = useState<any[]>([])
+  const [proyectosDisponibles, setProyectosDisponibles] = useState<any[]>([])
   const [aplicando, setAplicando] = useState<string | null>(null)
   const [yaAplico, setYaAplico] = useState<Set<string>>(new Set())
   const fileRef = useRef<HTMLInputElement>(null)
@@ -33,12 +35,17 @@ export default function PerfilCompleto({ usuarioId, onVerConexion }: Props) {
       foto: data.foto || '',
       habilidades: data.habilidades || [],
       experiencias: data.experiencias || [],
+      empresaId: data.empresaId || '',
+      proyectos: data.proyectosIds || [],
     })
     setYaAplico(new Set(data.aplicaciones?.map((a: any) => a.ofertaId) || []))
   }
 
-  useEffect(() => { if (id) cargar() }, [id])
-
+    useEffect(() => {
+    if (id) cargar()
+    fetch('/api/empresas').then(r => r.json()).then(setEmpresas).catch(() => {})
+    fetch('/api/proyectos').then(r => r.json()).then(setProyectosDisponibles).catch(() => {})
+  }, [id])
   const handleFoto = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -284,24 +291,77 @@ export default function PerfilCompleto({ usuarioId, onVerConexion }: Props) {
           )}
         </div>
 
+        {/* Empresa */}
+        <div className="bg-white rounded-xl border border-[#e0dfdc] p-5">
+          <h3 className="font-semibold mb-3">Empresa</h3>
+          {esMiPerfil && editando ? (
+            <div>
+              <label className="text-xs text-[#00000099] block mb-1">Empresa donde trabajas</label>
+              <select
+                className="w-full border border-[#c0c0c0] rounded-lg px-3 py-2 text-sm outline-none focus:border-[#0a66c2] bg-white"
+                value={form.empresaId || ''}
+                onChange={e => setForm((f: any) => ({ ...f, empresaId: e.target.value }))}
+              >
+                <option value="">Sin empresa</option>
+                {empresas.map((e: any) => (
+                  <option key={e.id} value={e.id}>{e.nombre} — {e.sector}</option>
+                ))}
+              </select>
+            </div>
+          ) : (
+            <p className="text-sm text-[#00000099]">
+              {perfil.empresa || 'Sin empresa registrada'}
+            </p>
+          )}
+        </div>
+
         {/* Proyectos */}
-        {perfil.proyectos?.length > 0 && (
-          <div className="bg-white rounded-xl border border-[#e0dfdc] p-5">
-            <h3 className="font-semibold mb-3">Proyectos</h3>
-            <div className="flex flex-col divide-y divide-[#e0dfdc]">
-              {perfil.proyectos.map((p: any, i: number) => (
-                <div key={i} className="py-3 first:pt-0 last:pb-0">
-                  <p className="font-medium text-sm">{p.nombre}</p>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {p.tecnologias?.map((t: string, j: number) => (
-                      <span key={j} className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded">{t}</span>
+        <div className="bg-white rounded-xl border border-[#e0dfdc] p-5">
+          <h3 className="font-semibold mb-3">Proyectos</h3>
+          {esMiPerfil && editando ? (
+            <div className="flex flex-col gap-2">
+              <label className="text-xs text-[#00000099] block mb-1">Proyectos en los que participas</label>
+              {proyectosDisponibles.map((p: any) => (
+                <label key={p.id} className="flex items-center gap-2 cursor-pointer">
+                  <input
+                    type="checkbox"
+                    checked={form.proyectos?.includes(p.id)}
+                    onChange={e => {
+                      setForm((f: any) => ({
+                        ...f,
+                        proyectos: e.target.checked
+                          ? [...(f.proyectos || []), p.id]
+                          : f.proyectos.filter((id: string) => id !== p.id)
+                      }))
+                    }}
+                  />
+                  <span className="text-sm">{p.nombre}</span>
+                  <div className="flex gap-1 flex-wrap">
+                    {p.tecnologias?.map((t: string, i: number) => (
+                      <span key={i} className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded">{t}</span>
                     ))}
                   </div>
-                </div>
+                </label>
               ))}
             </div>
-          </div>
-        )}
+          ) : (
+            <div className="flex flex-col divide-y divide-[#e0dfdc]">
+              {perfil.proyectos?.length === 0
+                ? <p className="text-sm text-[#00000099]">Sin proyectos registrados</p>
+                : perfil.proyectos?.map((p: any, i: number) => (
+                  <div key={i} className="py-3 first:pt-0 last:pb-0">
+                    <p className="font-medium text-sm">{p.nombre}</p>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {p.tecnologias?.map((t: string, j: number) => (
+                        <span key={j} className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded">{t}</span>
+                      ))}
+                    </div>
+                  </div>
+                ))
+              }
+            </div>
+          )}
+        </div>
 
         {/* Conexiones */}
         <div className="bg-white rounded-xl border border-[#e0dfdc] p-5">
