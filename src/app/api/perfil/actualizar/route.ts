@@ -3,7 +3,7 @@ import driver from '@/lib/neo4j'
 
 export async function PUT(req: Request) {
   const body = await req.json()
-  const { id, nombre, cargo, email, about, foto, ubicacion, habilidades, experiencias } = body
+  const { id, nombre, cargo, email, about, foto, ubicacion, habilidades, experiencias, empresaId, proyectos } = body
 
   try {
     const s1 = driver.session()
@@ -43,6 +43,32 @@ export async function PUT(req: Request) {
         CREATE (u)-[:TIENE_EXPERIENCIA]->(e)
       `, { id, eid: Date.now().toString() + Math.random(), ...exp })
         .finally(() => s.close())
+    }
+
+    // Actualizar empresa (TRABAJA_EN)
+    const s4 = driver.session()
+    await s4.run(`MATCH (u:Usuario {id:$id})-[r:TRABAJA_EN]->() DELETE r`, { id })
+      .finally(() => s4.close())
+
+    if (empresaId) {
+      const s = driver.session()
+      await s.run(`
+        MATCH (u:Usuario {id:$id}), (e:Empresa {id:$empresaId})
+        MERGE (u)-[:TRABAJA_EN]->(e)
+      `, { id, empresaId }).finally(() => s.close())
+    }
+
+    // Actualizar proyectos (PARTICIPA_EN)
+    const s5 = driver.session()
+    await s5.run(`MATCH (u:Usuario {id:$id})-[r:PARTICIPA_EN]->() DELETE r`, { id })
+      .finally(() => s5.close())
+
+    for (const proyectoId of proyectos || []) {
+      const s = driver.session()
+      await s.run(`
+        MATCH (u:Usuario {id:$id}), (p:Proyecto {id:$proyectoId})
+        MERGE (u)-[:PARTICIPA_EN]->(p)
+      `, { id, proyectoId }).finally(() => s.close())
     }
 
     return NextResponse.json({ ok: true })
