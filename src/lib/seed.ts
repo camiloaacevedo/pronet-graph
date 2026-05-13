@@ -36,8 +36,8 @@ async function seed() {
     `)
 
     await session.run(`
-      CREATE (o1:Oferta {id: '1', titulo: 'Senior React Developer', salario: '$3000'})
-      CREATE (o2:Oferta {id: '2', titulo: 'Data Engineer', salario: '$3500'})
+      CREATE (o1:Oferta {id: '1', titulo: 'Senior React Developer', salario: '$3000', empresaId: '1'})
+      CREATE (o2:Oferta {id: '2', titulo: 'Data Engineer', salario: '$3500', empresaId: '2'})
     `)
 
     await session.run(`MATCH (u1:Usuario {id:'1'}), (u2:Usuario {id:'2'}) CREATE (u1)-[:CONECTA_CON]->(u2)`)
@@ -69,7 +69,6 @@ async function seed() {
     await session.run(`MATCH (o2:Oferta {id:'2'}), (h3:Habilidad {id:'3'}) CREATE (o2)-[:REQUIERE]->(h3)`)
     await session.run(`MATCH (o2:Oferta {id:'2'}), (h5:Habilidad {id:'5'}) CREATE (o2)-[:REQUIERE]->(h5)`)
 
-
     // Mensajes de prueba
     await session.run(`
       MATCH (u1:Usuario {id:'1'}), (u2:Usuario {id:'2'})
@@ -87,7 +86,7 @@ async function seed() {
       CREATE (u3)-[:ENVIO]->(m3)<-[:RECIBIO]-(u1)
     `)
 
-    // Aplicaciones a ofertas (para demostrar candidatos_para_oferta)
+    // Aplicaciones a ofertas
     await session.run(`MATCH (u1:Usuario {id:'1'}), (o1:Oferta {id:'1'}) CREATE (u1)-[:APLICO_A]->(o1)`)
     await session.run(`MATCH (u4:Usuario {id:'4'}), (o1:Oferta {id:'1'}) CREATE (u4)-[:APLICO_A]->(o1)`)
     await session.run(`MATCH (u3:Usuario {id:'3'}), (o2:Oferta {id:'2'}) CREATE (u3)-[:APLICO_A]->(o2)`)
