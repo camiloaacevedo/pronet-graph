@@ -96,7 +96,7 @@ export default function PerfilCompleto({ usuarioId, onVerConexion, onVerConexion
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, ...form, empresaId })
     })
-    if (esMiPerfil) login({ ...usuario!, nombre: form.nombre, email: form.email, cargo: form.cargo })
+    if (esMiPerfil) login({ ...usuario!, nombre: form.nombre, email: form.email, cargo: form.cargo, foto: form.foto })
     await cargar()
     setEditando(false)
     setGuardando(false)
